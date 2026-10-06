@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "autonomous_mode": {
+    "enabled": true,
+    "max_steps": 12,
+    "require_confirmation_for": [
+      "merge_pull_request",
+      "delete_file",
+      "send_message",
+      "publish",
+      "deploy_production"
+    ]
+  },
+  "servers": {
+    "github": {"enabled": true, "transport": "mcp"},
+    "figma": {"enabled": true, "transport": "mcp"},
+    "notion": {"enabled": true, "transport": "mcp"},
+    "vercel": {"enabled": true, "transport": "mcp"},
+    "heygen": {"enabled": true, "transport": "mcp"},
+    "magnific": {"enabled": true, "transport": "mcp"},
+    "spotify": {"enabled": true, "transport": "mcp"},
+    "moviefind": {"enabled": true, "transport": "mcp"}
+  }
+}

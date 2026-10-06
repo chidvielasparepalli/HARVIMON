@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHIDVI Web Console</title>
+  <script src="/static/crypto.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --bg: #06080d;
+      --panel: #0c111a;
+      --panel-2: #101827;
+      --line: rgba(184, 202, 222, 0.14);
+      --accent: #16c7d9;
+      --accent-2: #f5b841;
+      --ok: #32d583;
+      --danger: #ff6b7a;
+      --text: #d9e7f2;
+      --muted: #7f91a6;
+    }
+    html, body {
+      height: 100%; margin: 0; background: var(--bg); color: var(--text);
+      font-family: Inter, Segoe UI, system-ui, sans-serif; overflow: hidden;
+    }
+    body { display: grid; grid-template-columns: 248px 1fr 320px; grid-template-rows: 64px 1fr 86px; }
+    header {
+      grid-column: 1 / 4; display: flex; align-items: center; gap: 18px;
+      padding: 0 22px; border-bottom: 1px solid var(--line); background: #070b12;
+    }
+    .brand { font-size: 18px; font-weight: 800; letter-spacing: 4px; }
+    .brand span { color: var(--accent); }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 10px;
+      border: 1px solid var(--line); border-radius: 999px; color: var(--muted);
+      font-size: 11px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase;
+    }
+    .badge.on { color: var(--ok); border-color: rgba(50,213,131,.34); background: rgba(50,213,131,.08); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .top-spacer { flex: 1; }
+    .link-btn {
+      color: var(--muted); text-decoration: none; border: 1px solid var(--line);
+      padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;
+    }
+    aside, .right {
+      min-height: 0; background: var(--panel); border-right: 1px solid var(--line);
+      padding: 18px; overflow: auto;
+    }
+    .right { border-right: 0; border-left: 1px solid var(--line); }
+    .section-title {
+      color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: 1.6px;
+      text-transform: uppercase; margin: 0 0 10px;
+    }
+    .metric {
+      border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.025);
+      padding: 12px; margin-bottom: 10px;
+    }
+    .metric strong { display: block; font-size: 13px; margin-bottom: 4px; }
+    .metric span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    main { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+    .stage {
+      height: 210px; border-bottom: 1px solid var(--line); background:
+        linear-gradient(180deg, rgba(22,199,217,.10), transparent 78%), #080c13;
+      display: grid; place-items: center; position: relative; overflow: hidden;
+    }
+    .core {
+      width: 134px; height: 134px; border-radius: 50%; border: 1px solid rgba(22,199,217,.48);
+      display: grid; place-items: center; color: var(--accent); font-weight: 900; letter-spacing: 2px;
+      box-shadow: 0 0 44px rgba(22,199,217,.2), inset 0 0 42px rgba(22,199,217,.08);
+    }
+    .stage small { position: absolute; bottom: 18px; color: var(--muted); font-size: 12px; }
+    #feed {
+      flex: 1; min-height: 0; overflow: auto; padding: 18px 22px; display: flex;
+      flex-direction: column; gap: 12px;
+    }
+    .msg { max-width: 76%; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; line-height: 1.5; white-space: pre-wrap; }
+    .msg.user { align-self: flex-end; background: rgba(255,255,255,.04); }
+    .msg.jarvis { align-self: flex-start; background: rgba(22,199,217,.08); border-color: rgba(22,199,217,.22); }
+    .msg.sys { align-self: center; color: var(--muted); border: 0; background: transparent; font-size: 12px; padding: 2px 0; }
+    .label { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
+    footer {
+      grid-column: 2 / 3; display: flex; align-items: center; gap: 10px;
+      padding: 16px 18px; border-top: 1px solid var(--line); background: #080c13;
+    }
+    input {
+      flex: 1; height: 48px; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--panel-2); color: var(--text); padding: 0 14px; outline: none; font-size: 14px;
+    }
+    input:focus { border-color: rgba(22,199,217,.65); }
+    button {
+      height: 48px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2);
+      color: var(--text); padding: 0 16px; font-size: 12px; font-weight: 900;
+      letter-spacing: 1.2px; cursor: pointer;
+    }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #031316; }
+    button.ok { background: var(--ok); border-color: var(--ok); color: #02150b; }
+    button.danger { border-color: rgba(255,107,122,.45); color: var(--danger); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    #permission {
+      position: fixed; inset: 0; background: rgba(0,0,0,.68); z-index: 20;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    #permission.show { display: flex; }
+    .dialog {
+      width: min(560px, 100%); border: 1px solid var(--line); border-radius: 8px;
+      background: #0b111d; padding: 20px; box-shadow: 0 26px 80px rgba(0,0,0,.5);
+    }
+    .dialog-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .risk { font-size: 11px; font-weight: 900; letter-spacing: 1.5px; color: var(--accent-2); text-transform: uppercase; }
+    .command-preview {
+      margin: 16px 0; padding: 14px; border-radius: 8px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.04); white-space: pre-wrap; overflow-wrap: anywhere;
+    }
+    .dialog p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+    @media (max-width: 980px) {
+      body { grid-template-columns: 1fr; grid-template-rows: 64px 1fr 86px; }
+      aside, .right { display: none; }
+      header, footer { grid-column: 1; }
+      .stage { height: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="permission">
+    <div class="dialog">
+      <div class="dialog-head">
+        <h3 style="margin:0">Approve Task</h3>
+        <div class="risk" id="risk">LOW</div>
+      </div>
+      <div class="command-preview" id="command-preview"></div>
+      <p id="permission-note"></p>
+      <div class="dialog-actions">
+        <button class="danger" onclick="denyPermission()">Cancel</button>
+        <button class="ok" onclick="approvePermission()">Allow</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="brand"><span>CHIDVI</span> WEB CONSOLE</div>
+    <div class="badge" id="status"><span class="dot"></span><span id="status-text">Connecting</span></div>
+    <div class="top-spacer"></div>
+    <a class="link-btn" href="/mobile">Mobile Controller</a>
+  </header>
+
+  <aside>
+    <p class="section-title">Runtime</p>
+    <div class="metric"><strong>Source</strong><span>Existing main.py assistant runtime</span></div>
+    <div class="metric"><strong>Execution</strong><span>Commands enter the original dashboard queue only after approval.</span></div>
+    <div class="metric"><strong>Permissions</strong><span>Every typed browser task uses preview and execute.</span></div>
+  </aside>
+
+  <main>
+    <div class="stage">
+      <div class="core">CHIDVI</div>
+      <small id="stage-note">Waiting for the desktop runtime connection</small>
+    </div>
+    <div id="feed"></div>
+  </main>
+
+  <div class="right">
+    <p class="section-title">Result Panel</p>
+    <div class="metric"><strong>Latest Response</strong><span id="latest">No response yet.</span></div>
+    <div class="metric"><strong>Browser Permissions</strong><span>Microphone access, when used, is requested by the browser before streaming.</span></div>
+  </div>
+
+  <footer>
+    <input id="command" placeholder="Type a CHIDVI task..." autocomplete="off">
+    <button onclick="doWake()">Wake</button>
+    <button class="primary" onclick="previewCommand()">Send</button>
+  </footer>
+
+  <script>
+    let authToken = sessionStorage.getItem('jarvis_token');
+    let sessionKey = sessionStorage.getItem('jarvis_key');
+
+    const AES_SALT = 'JARVIS-DASHBOARD-v1';
+    let aesKey = null;
+    if (sessionKey && typeof CryptoJS !== 'undefined') aesKey = CryptoJS.SHA256(sessionKey + AES_SALT);
+
+    const feed = document.getElementById('feed');
+    const commandInput = document.getElementById('command');
+    let pending = null;
+    let ws = null;
+
+    async function ensureSession() {
+      if (authToken) return true;
+      try {
+        const res = await fetch('/api/local-session', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok && data.token) {
+          authToken = data.token;
+          sessionStorage.setItem('jarvis_token', authToken);
+          if (data.assistant_name) document.querySelector('.brand').innerHTML = `<span>${esc(data.assistant_name)}</span> WEB CONSOLE`;
+          return true;
+        }
+      } catch (_) {}
+      location.replace('/login');
+      return false;
+    }
+
+    function authFetch(url, opts = {}) {
+      opts.headers = Object.assign({}, opts.headers, { Authorization: `Bearer ${authToken}` });
+      return fetch(url, opts);
+    }
+
+    function encrypt(text) {
+      if (!aesKey || typeof CryptoJS === 'undefined') return null;
+      try {
+        const iv = CryptoJS.lib.WordArray.random(16);
+        const enc = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(text), aesKey, {
+          iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7
+        });
+        const hex = iv.toString(CryptoJS.enc.Hex) + enc.ciphertext.toString(CryptoJS.enc.Hex);
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+        return btoa(String.fromCharCode(...bytes));
+      } catch { return null; }
+    }
+
+    function commandBody(text) {
+      return { text };
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function addMessage(kind, text) {
+      const div = document.createElement('div');
+      div.className = `msg ${kind}`;
+      if (kind === 'sys') div.textContent = text;
+      else div.innerHTML = `<div class="label">${kind === 'user' ? 'You' : 'CHIDVI'}</div>${esc(text)}`;
+      feed.appendChild(div);
+      feed.scrollTop = feed.scrollHeight;
+      if (kind === 'jarvis') document.getElementById('latest').textContent = text;
+    }
+
+    function setStatus(state) {
+      const badge = document.getElementById('status');
+      const text = document.getElementById('status-text');
+      const note = document.getElementById('stage-note');
+      if (state === 'active') {
+        badge.className = 'badge on'; text.textContent = 'Active'; note.textContent = 'Connected to CHIDVI runtime';
+      } else {
+        badge.className = 'badge'; text.textContent = 'Sleeping'; note.textContent = 'Runtime is sleeping or waiting';
+      }
+    }
+
+    async function previewCommand() {
+      const text = commandInput.value.trim();
+      if (!text) return;
+      commandInput.value = '';
+      addMessage('sys', 'Preparing permission request...');
+      const res = await authFetch('/api/intent/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(commandBody(text))
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.execution_token) {
+        addMessage('sys', data.error || 'Could not prepare permission request.');
+        return;
+      }
+      pending = data;
+      document.getElementById('risk').textContent = (data.risk_level || 'low').toUpperCase() + ' RISK';
+      document.getElementById('command-preview').textContent = data.description || text;
+      document.getElementById('permission-note').textContent = data.notice || 'This task runs only after approval.';
+      document.getElementById('permission').classList.add('show');
+    }
+
+    async function approvePermission() {
+      if (!pending) return;
+      if (pending.confirm) {
+        pending = null;
+        document.getElementById('permission').classList.remove('show');
+        await authFetch('/api/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accepted: true })
+        });
+        addMessage('sys', 'Confirmed.');
+        return;
+      }
+      const token = pending.execution_token;
+      const text = pending.description;
+      pending = null;
+      document.getElementById('permission').classList.remove('show');
+      addMessage('user', text);
+      addMessage('sys', 'Approved. Sending to the existing CHIDVI runtime...');
+      const res = await authFetch('/api/intent/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ execution_token: token, approved: true })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) addMessage('sys', data.error || 'Could not execute the approved task.');
+    }
+
+    function denyPermission() {
+      if (!pending) return;
+      if (pending.confirm) {
+        pending = null;
+        document.getElementById('permission').classList.remove('show');
+        authFetch('/api/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accepted: false })
+        }).catch(() => {});
+        addMessage('sys', 'Cancelled.');
+        return;
+      }
+      const token = pending.execution_token;
+      pending = null;
+      document.getElementById('permission').classList.remove('show');
+      addMessage('sys', 'Cancelled. Nothing was sent to CHIDVI.');
+      authFetch('/api/intent/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ execution_token: token, approved: false })
+      }).catch(() => {});
+    }
+
+    function doWake() {
+      addMessage('sys', 'Sending wake signal...');
+      authFetch('/api/wake', { method: 'POST' });
+    }
+
+    commandInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') previewCommand();
+    });
+
+    function startSocket() {
+      const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
+      ws = new WebSocket(`${wsProto}://${location.host}/ws?token=${encodeURIComponent(authToken)}`);
+      ws.onopen = () => addMessage('sys', 'Browser console connected.');
+      ws.onclose = () => addMessage('sys', 'Connection closed. Refresh after restarting CHIDVI.');
+      ws.onerror = () => addMessage('sys', 'WebSocket connection error.');
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (msg.type === 'status') setStatus(msg.state);
+        if (msg.type === 'sys') addMessage('sys', msg.text);
+        if (msg.type === 'log') addMessage(msg.speaker === 'jarvis' ? 'jarvis' : 'user', msg.text);
+        if (msg.type === 'content') addMessage('jarvis', `${msg.title}\n\n${msg.text}`);
+        if (msg.type === 'confirm' && msg.active) {
+          pending = { execution_token: '__confirm__', description: msg.title, confirm: true };
+          document.getElementById('risk').textContent = 'SYSTEM CONFIRM';
+          document.getElementById('command-preview').textContent = msg.title;
+          document.getElementById('permission-note').textContent = msg.detail;
+          document.getElementById('permission').classList.add('show');
+        }
+      };
+    }
+
+    ensureSession().then((ok) => { if (ok) startSocket(); });
+  </script>
+</body>
+</html>
