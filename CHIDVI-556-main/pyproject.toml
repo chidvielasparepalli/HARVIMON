@@ -1,2 +1,14 @@
+[project]
+name = "harvimon-ai"
+version = "0.1.0"
+description = "HARVIMON AI dashboard"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+  "cryptography",
+  "python-multipart",
+]
+
 [tool.vercel]
 entrypoint = "dashboard.server:app"
