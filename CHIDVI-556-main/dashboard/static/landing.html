@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-store">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="description" content="HARVIMON AI is a voice-first intelligent agent for natural interaction, reasoning, decision support, and assistance.">
+  <title>HARVIMON AI - Real-Time Voice Agent</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --bg: #03070c;
+      --bg-2: #071018;
+      --panel: rgba(9, 18, 28, 0.68);
+      --panel-2: rgba(255, 255, 255, 0.055);
+      --line: rgba(160, 220, 255, 0.16);
+      --line-strong: rgba(105, 223, 255, 0.42);
+      --text: #eef8ff;
+      --muted: #9ab0be;
+      --cyan: #38d5ff;
+      --green: #69f0a7;
+      --amber: #ffbd58;
+      --coral: #ff6f8f;
+      --magenta: #ff4fad;
+      --violet: #a79bff;
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.45);
+      --max: 1180px;
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        linear-gradient(rgba(78, 203, 255, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(78, 203, 255, 0.055) 1px, transparent 1px),
+        radial-gradient(circle at 50% 18%, rgba(47, 213, 255, 0.16), transparent 29rem),
+        radial-gradient(circle at 82% 22%, rgba(255, 79, 173, 0.12), transparent 28rem),
+        linear-gradient(140deg, #020407 0%, #07131d 50%, #020407 100%);
+      background-size: 56px 56px, 56px 56px, auto, auto;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background:
+        linear-gradient(110deg, rgba(56, 213, 255, 0.12), transparent 28%),
+        linear-gradient(250deg, rgba(105, 240, 167, 0.1), transparent 30%),
+        radial-gradient(circle at 88% 22%, rgba(255, 79, 173, 0.12), transparent 22rem);
+      opacity: 0.72;
+      pointer-events: none;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: 12px;
+      z-index: 100;
+      transform: translateY(-150%);
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #071018;
+      color: var(--text);
+      border: 1px solid var(--line-strong);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .shell { min-height: 100vh; position: relative; }
+
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      border-bottom: 1px solid transparent;
+      transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .site-nav.scrolled {
+      background: rgba(3, 7, 12, 0.76);
+      border-color: var(--line);
+      box-shadow: 0 18px 52px rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 78px;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(56, 213, 255, 0.48);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle, rgba(105, 240, 167, 0.28), transparent 58%),
+        rgba(56, 213, 255, 0.08);
+      box-shadow: 0 0 26px rgba(56, 213, 255, 0.22);
+    }
+
+    .brand-mark::before {
+      content: "";
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid var(--cyan);
+      box-shadow: 0 0 18px var(--cyan), inset 0 0 12px rgba(105, 240, 167, 0.32);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .nav-links a {
+      padding: 10px 14px;
+      border-radius: 8px;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.07);
+      outline: none;
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+
+    .hamburger {
+      display: none;
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.045);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      margin: 4px auto;
+      border-radius: 2px;
+      background: currentColor;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.045);
+      cursor: pointer;
+      font-weight: 760;
+      overflow: hidden;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: var(--line-strong);
+      outline: none;
+    }
+
+    .btn-primary {
+      background:
+        linear-gradient(135deg, rgba(56, 213, 255, 0.96), rgba(105, 240, 167, 0.86));
+      border-color: transparent;
+      color: #021014;
+      box-shadow: 0 0 38px rgba(56, 213, 255, 0.24);
+    }
+
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      transform: translateX(-120%);
+      transition: transform 420ms ease;
+    }
+
+    .btn-primary:hover::after,
+    .btn-primary:focus-visible::after { transform: translateX(120%); }
+
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      align-items: center;
+      padding: 118px 0 76px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -3;
+      background:
+        linear-gradient(90deg, rgba(3, 7, 12, 0.98) 0%, rgba(3, 7, 12, 0.86) 35%, rgba(3, 7, 12, 0.72) 100%),
+        radial-gradient(circle at 77% 37%, rgba(255, 79, 173, 0.24), transparent 30rem),
+        radial-gradient(circle at 69% 50%, rgba(56, 213, 255, 0.22), transparent 34rem),
+        linear-gradient(0deg, rgba(3, 7, 12, 0.98), rgba(3, 7, 12, 0.58) 42%, rgba(3, 7, 12, 0.92)),
+        url("/static/harvimon-product.png") center / cover no-repeat;
+      filter: saturate(1.12) contrast(1.06);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 18vh;
+      z-index: -1;
+      background: linear-gradient(transparent, var(--bg));
+    }
+
+    .hero-inner {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.72fr);
+      align-items: center;
+      gap: clamp(32px, 6vw, 86px);
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 12;
+      margin-right: clamp(-150px, -8vw, -70px);
+      text-shadow: 0 4px 28px rgba(0, 0, 0, 0.86);
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      inset: -28px -34px -24px -24px;
+      z-index: -1;
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 28% 38%, rgba(3, 7, 12, 0.74), transparent 21rem),
+        linear-gradient(90deg, rgba(3, 7, 12, 0.84), rgba(3, 7, 12, 0.42), transparent);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--green);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(3.8rem, 9vw, 8.4rem);
+      line-height: 0.88;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .hero h2 {
+      margin: 24px 0 0;
+      max-width: 710px;
+      font-size: clamp(1.45rem, 3vw, 2.55rem);
+      line-height: 1.08;
+      font-weight: 760;
+      color: #d9f9ff;
+      text-wrap: balance;
+    }
+
+    .hero p {
+      margin: 22px 0 0;
+      max-width: 650px;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.35vw, 1.18rem);
+      line-height: 1.72;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .hero-signal {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+      color: #c8dce7;
+      font-size: 0.86rem;
+    }
+
+    .signal-pill {
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .voice-stage {
+      position: relative;
+      z-index: 3;
+      min-height: 520px;
+      display: grid;
+      place-items: center;
+      perspective: 900px;
+    }
+
+    .voice-stage::before,
+    .voice-stage::after {
+      content: "";
+      position: absolute;
+      width: 86%;
+      height: 34%;
+      border: 1px solid rgba(255, 79, 173, 0.28);
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 50%;
+      filter: blur(0.2px);
+      pointer-events: none;
+      transform: rotate(-17deg);
+      box-shadow: 0 0 26px rgba(255, 79, 173, 0.22);
+      animation: ribbonDrift 7s ease-in-out infinite alternate;
+    }
+
+    .voice-stage::after {
+      width: 76%;
+      height: 28%;
+      border-color: rgba(56, 213, 255, 0.3);
+      border-top-color: transparent;
+      transform: rotate(18deg) translateY(44px);
+      box-shadow: 0 0 28px rgba(56, 213, 255, 0.26);
+      animation-delay: -2s;
+    }
+
+    .voice-core {
+      position: relative;
+      width: min(470px, 86vw);
+      aspect-ratio: 0.86;
+      display: grid;
+      place-items: center;
+      transform-style: preserve-3d;
+    }
+
+    .neon-avatar {
+      position: absolute;
+      inset: -4% 2% 5%;
+      z-index: 2;
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 52% 32%, rgba(255, 255, 255, 0.18), transparent 8rem),
+        linear-gradient(90deg, rgba(3, 7, 12, 0.2), rgba(3, 7, 12, 0.02), rgba(3, 7, 12, 0.36)),
+        url("/static/harvimon-neon-blue.png") center / cover no-repeat,
+        linear-gradient(150deg, rgba(255, 79, 173, 0.1), rgba(56, 213, 255, 0.09));
+      border: 1px solid rgba(161, 231, 255, 0.14);
+      box-shadow:
+        0 0 70px rgba(255, 79, 173, 0.2),
+        0 0 84px rgba(56, 213, 255, 0.18),
+        inset 0 0 58px rgba(3, 7, 12, 0.9);
+      opacity: 0.92;
+    }
+
+    .neon-avatar img {
+      display: none;
+    }
+
+    .neon-avatar::before,
+    .neon-avatar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .neon-avatar::before {
+      background:
+        radial-gradient(circle at 61% 36%, rgba(56, 213, 255, 0.16), transparent 15rem),
+        radial-gradient(circle at 45% 55%, rgba(255, 79, 173, 0.13), transparent 17rem),
+        linear-gradient(0deg, rgba(3, 7, 12, 0.64), transparent 35%, rgba(3, 7, 12, 0.2));
+    }
+
+    .neon-avatar::after {
+      border: 1px solid rgba(56, 213, 255, 0.22);
+      border-radius: inherit;
+      box-shadow: inset 0 0 48px rgba(255, 79, 173, 0.14);
+    }
+
+    .orb {
+      position: absolute;
+      z-index: 5;
+      width: 20%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 38% 34%, rgba(255, 255, 255, 0.96), rgba(255, 79, 173, 0.68) 20%, rgba(56, 213, 255, 0.42) 48%, rgba(25, 84, 116, 0.18) 72%, rgba(2, 8, 13, 0.62)),
+        conic-gradient(from 90deg, var(--cyan), var(--magenta), var(--green), var(--amber), var(--cyan));
+      box-shadow:
+        0 0 48px rgba(56, 213, 255, 0.42),
+        0 0 95px rgba(255, 79, 173, 0.22),
+        inset 0 0 42px rgba(255, 255, 255, 0.2);
+      animation: corePulse 4.8s ease-in-out infinite;
+      transform: translateY(70px);
+    }
+
+    .voice-core:hover .orb { animation-duration: 1.8s; }
+
+    .ring {
+      position: absolute;
+      z-index: 4;
+      inset: var(--inset);
+      border: 1px solid rgba(87, 217, 255, var(--alpha));
+      border-radius: 50%;
+      box-shadow: 0 0 28px rgba(56, 213, 255, 0.12);
+      animation: ringSpin var(--speed) linear infinite;
+    }
+
+    .ring::before,
+    .ring::after {
+      content: "";
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--dot);
+      box-shadow: 0 0 18px var(--dot);
+      top: 18%;
+      left: 18%;
+    }
+    .ring::after { top: auto; left: auto; right: 12%; bottom: 26%; opacity: 0.72; }
+
+    .waveform {
+      position: absolute;
+      z-index: 7;
+      width: 72%;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transform: translateY(190px);
+    }
+
+    .waveform i {
+      width: 4px;
+      height: 18px;
+      border-radius: 4px;
+      background: linear-gradient(var(--cyan), var(--green));
+      box-shadow: 0 0 16px rgba(56, 213, 255, 0.32);
+      animation: wave 980ms ease-in-out infinite;
+      animation-delay: calc(var(--i) * 72ms);
+    }
+
+    .voice-core:hover .waveform i { animation-duration: 520ms; }
+
+    .particle {
+      position: absolute;
+      z-index: 5;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(224, 249, 255, 0.8);
+      box-shadow: 0 0 12px rgba(56, 213, 255, 0.72);
+      transform: rotate(var(--a)) translateX(var(--r));
+      animation: particleFlow var(--d) ease-in-out infinite alternate;
+    }
+
+    .status-line {
+      position: absolute;
+      z-index: 8;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(360px, 92%);
+      padding: 13px 16px;
+      border: 1px solid rgba(56, 213, 255, 0.26);
+      border-radius: 8px;
+      background: rgba(3, 7, 12, 0.72);
+      color: #dffaff;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .status-line strong { color: var(--cyan); }
+    .status-dot {
+      flex: 0 0 auto;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 16px var(--green);
+    }
+
+    main section {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: clamp(72px, 10vw, 132px) 0;
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 42px;
+    }
+
+    .section-label {
+      color: var(--cyan);
+      font-weight: 820;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: clamp(2.15rem, 5vw, 4.4rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .section-head p,
+    .section-copy {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.78;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      align-items: center;
+      margin-top: 42px;
+    }
+
+    .flow-node {
+      min-height: 138px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
+      backdrop-filter: blur(16px);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flow-node::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent, rgba(56, 213, 255, 0.14), transparent);
+      transform: translateX(-110%);
+      animation: scan 6s ease-in-out infinite;
+    }
+
+    .flow-node strong { font-size: 1.03rem; }
+    .flow-connector {
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--green), var(--amber));
+      box-shadow: 0 0 16px rgba(56, 213, 255, 0.34);
+      position: relative;
+      overflow: hidden;
+    }
+    .flow-connector::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      width: 38%;
+      background: rgba(255, 255, 255, 0.86);
+      filter: blur(6px);
+      animation: connector 2.8s linear infinite;
+    }
+
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .cap-card {
+      min-height: 230px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.026)),
+        radial-gradient(circle at 18% 12%, rgba(var(--glow), 0.18), transparent 18rem);
+      backdrop-filter: blur(18px);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .cap-card:hover,
+    .cap-card:focus-within {
+      transform: translateY(-5px);
+      border-color: rgba(var(--glow), 0.62);
+    }
+
+    .cap-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid rgba(var(--glow), 0.42);
+      display: grid;
+      place-items: center;
+      color: rgb(var(--glow));
+      background: rgba(var(--glow), 0.1);
+      margin-bottom: 22px;
+    }
+
+    .cap-icon svg { width: 22px; height: 22px; stroke-width: 1.8; }
+    .cap-card h4 { margin: 0 0 12px; font-size: 1.17rem; }
+    .cap-card p { margin: 0; color: var(--muted); line-height: 1.65; }
+
+    .voice-demo {
+      display: grid;
+      grid-template-columns: minmax(0, 0.84fr) minmax(330px, 0.6fr);
+      gap: clamp(24px, 5vw, 62px);
+      align-items: center;
+    }
+
+    .conversation {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(3, 7, 12, 0.58);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .conversation-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .conversation-body {
+      min-height: 356px;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+      align-content: center;
+    }
+
+    .bubble {
+      width: min(84%, 620px);
+      padding: 16px 18px;
+      border-radius: 8px;
+      line-height: 1.6;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .bubble.visible {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 360ms ease, transform 360ms ease;
+    }
+
+    .bubble.user {
+      justify-self: end;
+      background: rgba(255, 255, 255, 0.075);
+    }
+
+    .bubble.ai {
+      justify-self: start;
+      background: rgba(56, 213, 255, 0.085);
+      border-color: rgba(56, 213, 255, 0.22);
+    }
+
+    .bubble b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .demo-wave {
+      display: flex;
+      align-items: end;
+      gap: 6px;
+      height: 112px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .demo-wave i {
+      flex: 1;
+      min-width: 5px;
+      border-radius: 8px 8px 2px 2px;
+      background: linear-gradient(var(--green), var(--cyan));
+      height: calc(20% + var(--h) * 1%);
+      animation: wave 1s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 80ms);
+    }
+
+    .work-steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      position: relative;
+    }
+
+    .work-step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.045);
+      min-height: 232px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .work-step::after {
+      content: "";
+      position: absolute;
+      top: 30px;
+      right: -22px;
+      width: 44px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+      box-shadow: 0 0 14px rgba(56, 213, 255, 0.45);
+    }
+    .work-step:last-child::after { display: none; }
+
+    .step-num {
+      color: var(--amber);
+      font-weight: 860;
+      letter-spacing: 0.13em;
+      margin-bottom: 42px;
+    }
+    .work-step h4 { margin: 0 0 12px; font-size: 1.35rem; }
+    .work-step p { margin: 0; color: var(--muted); line-height: 1.65; }
+
+    .use-case-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .use-case {
+      min-height: 118px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px;
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+
+    .use-case:hover {
+      transform: translateY(-3px);
+      border-color: rgba(105, 240, 167, 0.45);
+    }
+
+    .use-case span {
+      color: var(--green);
+      font-size: 0.74rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .use-case strong { font-size: 1.06rem; }
+
+    .download-band {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto clamp(60px, 8vw, 94px);
+      padding: clamp(34px, 7vw, 72px);
+      border: 1px solid rgba(56, 213, 255, 0.24);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(56, 213, 255, 0.14), rgba(105, 240, 167, 0.08) 42%, rgba(255, 111, 143, 0.1)),
+        rgba(3, 7, 12, 0.78);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .download-band h3 { font-size: clamp(2.3rem, 5vw, 5rem); }
+    .download-band p { margin: 16px 0 0; color: var(--muted); line-height: 1.7; max-width: 620px; }
+    .platform {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      color: #d6f5ff;
+      font-weight: 760;
+    }
+    .platform::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      box-shadow: 0 0 16px rgba(56, 213, 255, 0.45);
+    }
+
+    .download-actions { display: grid; gap: 12px; justify-items: stretch; }
+    .download-message {
+      min-height: 24px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      text-align: center;
+    }
+    .download-message.error { color: #ff91a8; }
+    .download-message.ok { color: var(--green); }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: rgba(3, 7, 12, 0.78);
+    }
+
+    .footer-inner {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: center;
+      color: var(--muted);
+    }
+    .footer-inner p { margin: 10px 0 0; max-width: 520px; line-height: 1.6; }
+    .footer-links { display: flex; gap: 18px; flex-wrap: wrap; }
+    .footer-links a:hover,
+    .footer-links a:focus-visible { color: var(--text); outline: none; }
+    .copyright { grid-column: 1 / -1; font-size: 0.88rem; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 540ms ease, transform 540ms ease;
+    }
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes corePulse {
+      0%, 100% { transform: translateY(70px) scale(0.94); filter: hue-rotate(0deg); }
+      50% { transform: translateY(70px) scale(1.06); filter: hue-rotate(18deg); }
+    }
+    @keyframes avatarBreath {
+      0%, 100% { transform: scale(1.03) translateY(0); opacity: 0.72; }
+      50% { transform: scale(1.08) translateY(-8px); opacity: 0.9; }
+    }
+    @keyframes ribbonDrift {
+      from { opacity: 0.5; translate: -8px 0; }
+      to { opacity: 0.9; translate: 10px -8px; }
+    }
+    @keyframes ringSpin { to { transform: rotate(360deg); } }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.55); opacity: 0.68; }
+      50% { transform: scaleY(1.55); opacity: 1; }
+    }
+    @keyframes particleFlow {
+      from { opacity: 0.28; transform: rotate(var(--a)) translateX(calc(var(--r) - 16px)); }
+      to { opacity: 0.94; transform: rotate(calc(var(--a) + 18deg)) translateX(calc(var(--r) + 12px)); }
+    }
+    @keyframes scan { 45%, 100% { transform: translateX(110%); } }
+    @keyframes connector { to { transform: translateX(260%); } }
+
+    /* Professional visual pass: calmer, cleaner, and less template-like. */
+    html, body {
+      background:
+        linear-gradient(rgba(120, 201, 230, 0.026) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120, 201, 230, 0.026) 1px, transparent 1px),
+        linear-gradient(145deg, #020407 0%, #071019 46%, #020407 100%);
+      background-size: 72px 72px, 72px 72px, auto;
+    }
+
+    body::before {
+      background:
+        radial-gradient(circle at 72% 25%, rgba(75, 184, 255, 0.12), transparent 26rem),
+        radial-gradient(circle at 86% 70%, rgba(255, 79, 173, 0.08), transparent 24rem);
+      opacity: 1;
+    }
+
+    .site-nav.scrolled {
+      background: rgba(2, 6, 10, 0.84);
+      border-color: rgba(180, 224, 242, 0.12);
+      box-shadow: 0 12px 42px rgba(0, 0, 0, 0.28);
+    }
+
+    .brand {
+      letter-spacing: 0.09em;
+      font-weight: 820;
+    }
+
+    .brand-mark {
+      border-color: rgba(160, 220, 255, 0.3);
+      background: rgba(255, 255, 255, 0.035);
+      box-shadow: none;
+    }
+
+    .brand-mark::before {
+      border-color: #78dcff;
+      box-shadow: 0 0 16px rgba(120, 220, 255, 0.5);
+    }
+
+    .btn {
+      border-color: rgba(206, 232, 242, 0.18);
+      background: rgba(255, 255, 255, 0.035);
+      box-shadow: none;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(206, 232, 242, 0.34);
+    }
+
+    .btn-primary {
+      background: #ecfbff;
+      color: #021014;
+      box-shadow: 0 12px 34px rgba(84, 209, 255, 0.16);
+    }
+
+    .btn-primary::after { display: none; }
+
+    .hero {
+      min-height: 96svh;
+      align-items: end;
+      padding: 124px 0 96px;
+    }
+
+    .hero::before {
+      background:
+        linear-gradient(90deg, rgba(2, 5, 8, 0.98) 0%, rgba(2, 5, 8, 0.78) 42%, rgba(2, 5, 8, 0.3) 100%),
+        linear-gradient(0deg, rgba(2, 5, 8, 0.98) 0%, rgba(2, 5, 8, 0.18) 42%, rgba(2, 5, 8, 0.62) 100%),
+        radial-gradient(circle at 76% 42%, rgba(72, 172, 255, 0.23), transparent 28rem),
+        radial-gradient(circle at 78% 42%, rgba(255, 79, 173, 0.12), transparent 20rem),
+        url("/static/harvimon-neon-blue.png") right 9% center / min(54vw, 660px) no-repeat;
+      filter: saturate(0.92) contrast(1.06);
+    }
+
+    .hero::after {
+      height: 28vh;
+      background: linear-gradient(transparent, #020407 78%);
+    }
+
+    .hero-inner {
+      display: block;
+      position: relative;
+    }
+
+    .hero-copy {
+      max-width: 830px;
+      margin: 0;
+      text-shadow: 0 4px 26px rgba(0, 0, 0, 0.74);
+    }
+
+    .hero-copy::before {
+      inset: -36px -110px -34px -26px;
+      background:
+        radial-gradient(circle at 31% 37%, rgba(2, 5, 8, 0.7), transparent 25rem),
+        linear-gradient(90deg, rgba(2, 5, 8, 0.76), rgba(2, 5, 8, 0.42), transparent);
+    }
+
+    .eyebrow {
+      color: #8bdfff;
+      font-size: 0.74rem;
+      letter-spacing: 0.18em;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow::before {
+      background: #8bdfff;
+      box-shadow: 0 0 14px rgba(139, 223, 255, 0.55);
+    }
+
+    .hero h1 {
+      max-width: 820px;
+      font-size: clamp(4.2rem, 8vw, 7.2rem);
+      line-height: 0.9;
+      letter-spacing: 0;
+    }
+
+    .hero h2 {
+      max-width: 700px;
+      color: #f1fbff;
+      font-size: clamp(1.35rem, 2.2vw, 2.15rem);
+      line-height: 1.14;
+      font-weight: 720;
+    }
+
+    .hero p {
+      max-width: 610px;
+      color: #b6c9d4;
+      line-height: 1.72;
+    }
+
+    .hero-signal {
+      margin-top: 28px;
+      gap: 10px;
+      color: #a9bdc7;
+    }
+
+    .signal-pill {
+      padding: 8px 0;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      backdrop-filter: none;
+    }
+
+    .signal-pill + .signal-pill::before {
+      content: "/";
+      margin-right: 10px;
+      color: rgba(185, 215, 228, 0.38);
+    }
+
+    .voice-stage { display: none; }
+
+    main section {
+      padding: clamp(72px, 9vw, 118px) 0;
+    }
+
+    .section-label {
+      color: #79dfff;
+      letter-spacing: 0.17em;
+    }
+
+    h3 {
+      max-width: 900px;
+      font-size: clamp(2.2rem, 4.4vw, 4rem);
+      line-height: 1.02;
+    }
+
+    .flow-node,
+    .cap-card,
+    .conversation,
+    .demo-wave,
+    .work-step,
+    .use-case,
+    .download-band {
+      border-color: rgba(190, 226, 242, 0.13);
+      background: rgba(255, 255, 255, 0.035);
+      box-shadow: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .flow-node::before,
+    .flow-connector::after { display: none; }
+
+    .flow-connector {
+      background: rgba(121, 223, 255, 0.48);
+      box-shadow: none;
+    }
+
+    .cap-card {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.022));
+    }
+
+    .cap-card:hover,
+    .cap-card:focus-within {
+      transform: translateY(-3px);
+      border-color: rgba(121, 223, 255, 0.32);
+    }
+
+    .cap-icon {
+      border-color: rgba(121, 223, 255, 0.26);
+      background: rgba(121, 223, 255, 0.07);
+      color: #86e5ff;
+    }
+
+    .demo-wave i {
+      background: linear-gradient(#8df4ff, #70b8ff);
+      box-shadow: none;
+      opacity: 0.86;
+    }
+
+    .bubble.ai {
+      background: rgba(121, 223, 255, 0.07);
+      border-color: rgba(121, 223, 255, 0.18);
+    }
+
+    .bubble b,
+    .use-case span {
+      color: #85e3ff;
+    }
+
+    .step-num {
+      color: #ff9dbf;
+    }
+
+    .work-step::after {
+      background: rgba(121, 223, 255, 0.34);
+      box-shadow: none;
+    }
+
+    .download-band {
+      background:
+        linear-gradient(135deg, rgba(121, 223, 255, 0.085), rgba(255, 79, 173, 0.055)),
+        rgba(4, 10, 16, 0.82);
+    }
+
+    .platform::before {
+      background: #78dcff;
+      box-shadow: none;
+    }
+
+    @media (max-width: 960px) {
+      .hamburger { display: inline-grid; place-items: center; }
+      .nav-links {
+        position: absolute;
+        top: 76px;
+        left: 16px;
+        right: 16px;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(3, 7, 12, 0.94);
+        backdrop-filter: blur(18px);
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 14px 12px; }
+      .nav-actions .btn { display: none; }
+      .hero-inner,
+      .voice-demo,
+      .download-band {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        padding-top: 112px;
+      }
+      .voice-stage {
+        min-height: 420px;
+        order: -1;
+        opacity: 0.96;
+        margin-bottom: -104px;
+      }
+      .hero-copy {
+        margin-top: -54px;
+        margin-right: 0;
+      }
+      .hero-copy::before {
+        inset: -18px -14px -18px -14px;
+        background:
+          radial-gradient(circle at 40% 30%, rgba(3, 7, 12, 0.74), transparent 18rem),
+          linear-gradient(0deg, rgba(3, 7, 12, 0.78), rgba(3, 7, 12, 0.36), transparent);
+      }
+      .capability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flow { grid-template-columns: 1fr; }
+      .flow-connector {
+        width: 2px;
+        height: 36px;
+        justify-self: center;
+        background: linear-gradient(var(--cyan), var(--green), var(--amber));
+      }
+      .work-steps,
+      .use-case-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .work-step::after { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .nav-inner { width: min(100% - 24px, var(--max)); min-height: 70px; }
+      .brand { letter-spacing: 0.08em; font-size: 0.96rem; }
+      .hero { padding: 94px 0 56px; }
+      .hero-inner,
+      main section,
+      .download-band,
+      .footer-inner { width: calc(100% - 24px); }
+      .hero h1 { font-size: clamp(3.1rem, 18vw, 4.6rem); }
+      .hero-actions .btn { width: 100%; }
+      .voice-stage {
+        min-height: 350px;
+        margin-bottom: -86px;
+      }
+      .voice-core { width: min(330px, 94vw); }
+      .hero-copy { margin-top: -44px; }
+      .status-line { bottom: 8px; font-size: 0.68rem; }
+      .capability-grid,
+      .work-steps,
+      .use-case-grid { grid-template-columns: 1fr; }
+      .conversation-body { padding: 16px; min-height: 330px; }
+      .bubble { width: 100%; }
+      .download-actions .btn { width: 100%; }
+      .footer-inner { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 960px) {
+      .hero {
+        min-height: 92svh;
+        padding: 118px 0 72px;
+        align-items: end;
+      }
+
+      .hero::before {
+        background:
+          linear-gradient(0deg, rgba(2, 5, 8, 0.98) 0%, rgba(2, 5, 8, 0.58) 46%, rgba(2, 5, 8, 0.66) 100%),
+          linear-gradient(90deg, rgba(2, 5, 8, 0.9), rgba(2, 5, 8, 0.34)),
+          radial-gradient(circle at 68% 26%, rgba(72, 172, 255, 0.2), transparent 22rem),
+          url("/static/harvimon-neon-blue.png") top 82px right -74px / min(560px, 92vw) no-repeat;
+      }
+
+      .hero-copy {
+        margin: 0;
+        max-width: 760px;
+      }
+
+      .hero-copy::before {
+        inset: -24px -18px -24px -18px;
+        background:
+          radial-gradient(circle at 38% 40%, rgba(2, 5, 8, 0.74), transparent 20rem),
+          linear-gradient(0deg, rgba(2, 5, 8, 0.76), rgba(2, 5, 8, 0.34), transparent);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        min-height: 94svh;
+        padding: 104px 0 54px;
+      }
+
+      .hero::before {
+        background:
+          linear-gradient(0deg, rgba(2, 5, 8, 0.98) 0%, rgba(2, 5, 8, 0.68) 48%, rgba(2, 5, 8, 0.72) 100%),
+          radial-gradient(circle at 60% 23%, rgba(72, 172, 255, 0.18), transparent 18rem),
+          url("/static/harvimon-neon-blue.png") top 78px center / min(440px, 112vw) no-repeat;
+      }
+
+      .hero h1 {
+        font-size: clamp(3.4rem, 17vw, 4.7rem);
+        line-height: 0.92;
+      }
+
+      .hero h2 {
+        font-size: clamp(1.24rem, 7vw, 1.72rem);
+      }
+
+      .hero-signal {
+        gap: 6px 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+      }
+      .reveal { opacity: 1; transform: none; }
+      .bubble { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <nav class="site-nav" aria-label="Primary navigation">
+      <div class="nav-inner">
+        <a class="brand" href="#home" aria-label="HARVIMON home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>HARVIMON</span>
+        </a>
+        <div class="nav-links" id="nav-links">
+          <a href="#home">Home</a>
+          <a href="#capabilities">Capabilities</a>
+          <a href="#how">How It Works</a>
+          <a href="#use-cases">Use Cases</a>
+        </div>
+        <div class="nav-actions">
+          <a class="btn btn-primary" href="#download">Download</a>
+          <button class="hamburger" type="button" aria-controls="nav-links" aria-expanded="false" aria-label="Open navigation">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero" id="home">
+      <div class="hero-inner">
+        <div class="hero-copy reveal">
+          <div class="eyebrow">Voice + Context + Reasoning</div>
+          <h1>Meet HARVIMON.</h1>
+          <h2>Your voice. Your thoughts. One intelligent agent.</h2>
+          <p>HARVIMON enables natural voice-based interaction with an intelligent AI agent that understands context, reasons through problems, and helps users make decisions and accomplish tasks.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary js-download" type="button">Download HARVIMON</button>
+            <a class="btn" href="#what">Explore HARVIMON</a>
+          </div>
+          <div class="hero-signal" aria-label="HARVIMON interaction flow">
+            <span class="signal-pill">User speaks</span>
+            <span class="signal-pill">HARVIMON listens</span>
+            <span class="signal-pill">Reasons</span>
+            <span class="signal-pill">Responds</span>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="what" class="reveal">
+        <div class="section-head">
+          <div class="section-label">What Is HARVIMON?</div>
+          <h3>More than a voice assistant.</h3>
+          <p class="section-copy">HARVIMON is designed around natural conversation. Instead of forcing users through predefined menus and rigid workflows, it allows people to communicate naturally through voice and receive intelligent, context-aware responses.</p>
+        </div>
+        <div class="flow" aria-label="HARVIMON conversation process">
+          <div class="flow-node"><strong>Listen</strong></div>
+          <div class="flow-connector" aria-hidden="true"></div>
+          <div class="flow-node"><strong>Understand</strong></div>
+          <div class="flow-connector" aria-hidden="true"></div>
+          <div class="flow-node"><strong>Reason</strong></div>
+          <div class="flow-connector" aria-hidden="true"></div>
+          <div class="flow-node"><strong>Respond</strong></div>
+          <div class="flow-connector" aria-hidden="true"></div>
+          <div class="flow-node"><strong>Assist</strong></div>
+        </div>
+      </section>
+
+      <section id="capabilities">
+        <div class="section-head reveal">
+          <div class="section-label">Capabilities</div>
+          <h3>Built for natural, useful conversation.</h3>
+        </div>
+        <div class="capability-grid">
+          <article class="cap-card reveal" style="--glow: 56, 213, 255;">
+            <div class="cap-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v18"/><path d="M6 8v8"/><path d="M18 8v8"/><path d="M3 11v2"/><path d="M21 11v2"/></svg></div>
+            <h4>Natural Voice Interaction</h4>
+            <p>Speak naturally instead of typing commands.</p>
+          </article>
+          <article class="cap-card reveal" style="--glow: 105, 240, 167;">
+            <div class="cap-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 12a8 8 0 0 1 16 0"/><path d="M7 12a5 5 0 0 1 10 0"/><path d="M12 12v7"/><path d="M9 19h6"/></svg></div>
+            <h4>Context Understanding</h4>
+            <p>HARVIMON understands the context behind conversations instead of treating every request as an isolated command.</p>
+          </article>
+          <article class="cap-card reveal" style="--glow: 255, 189, 88;">
+            <div class="cap-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3a7 7 0 0 0-4 12.7V19h8v-3.3A7 7 0 0 0 12 3Z"/><path d="M9 22h6"/><path d="M10 15h4"/></svg></div>
+            <h4>Intelligent Reasoning</h4>
+            <p>It can reason through problems, analyze information, and help users arrive at decisions.</p>
+          </article>
+          <article class="cap-card reveal" style="--glow: 255, 111, 143;">
+            <div class="cap-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 6h14"/><path d="M5 12h10"/><path d="M5 18h14"/><path d="M17 10l2 2-2 2"/></svg></div>
+            <h4>Conversational Memory</h4>
+            <p>Maintain relevant conversational context to make interactions feel more natural.</p>
+          </article>
+          <article class="cap-card reveal" style="--glow: 167, 155, 255;">
+            <div class="cap-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-4 3 3 5-7"/></svg></div>
+            <h4>Decision Support</h4>
+            <p>Help users evaluate situations, compare possibilities, and make informed decisions.</p>
+          </article>
+          <article class="cap-card reveal" style="--glow: 116, 220, 255;">
+            <div class="cap-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 6h12v12H6z"/><path d="M9 3v3"/><path d="M15 3v3"/><path d="M9 18v3"/><path d="M15 18v3"/><path d="M3 9h3"/><path d="M18 9h3"/><path d="M3 15h3"/><path d="M18 15h3"/></svg></div>
+            <h4>Task Assistance</h4>
+            <p>Help users move from conversation toward meaningful actions and outcomes.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="voice-demo" aria-labelledby="demo-title">
+        <div class="reveal">
+          <div class="section-label">Live-Like Demonstration</div>
+          <h3 id="demo-title">A conversation that feels like momentum.</h3>
+          <p class="section-copy">This visual demonstration shows how HARVIMON can turn spoken uncertainty into structured thinking. It is not a live AI backend on this website.</p>
+          <div class="demo-wave" aria-hidden="true">
+            <i style="--i:1; --h:18"></i><i style="--i:2; --h:58"></i><i style="--i:3; --h:32"></i><i style="--i:4; --h:76"></i>
+            <i style="--i:5; --h:44"></i><i style="--i:6; --h:86"></i><i style="--i:7; --h:38"></i><i style="--i:8; --h:69"></i>
+            <i style="--i:9; --h:26"></i><i style="--i:10; --h:92"></i><i style="--i:11; --h:46"></i><i style="--i:12; --h:72"></i>
+          </div>
+        </div>
+        <div class="conversation reveal" aria-label="Mock HARVIMON conversation">
+          <div class="conversation-head"><span>HARVIMON Session</span><span>Visual demo</span></div>
+          <div class="conversation-body">
+            <div class="bubble user"><b>User</b>"Harvimon, help me figure out the best way to approach this problem."</div>
+            <div class="bubble ai"><b>HARVIMON</b>"Let's break it down. First, let's identify the constraints, then compare the paths that give you the most control."</div>
+            <div class="bubble user"><b>User</b>"I want the option that is practical, not just impressive."</div>
+            <div class="bubble ai"><b>HARVIMON</b>"Good. I will keep the plan grounded: what matters, what blocks it, and what you can do next."</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how">
+        <div class="section-head reveal">
+          <div class="section-label">How It Works</div>
+          <h3>Information flows through an intelligent system.</h3>
+        </div>
+        <div class="work-steps">
+          <article class="work-step reveal">
+            <div class="step-num">01</div>
+            <h4>Speak</h4>
+            <p>Talk naturally to HARVIMON.</p>
+          </article>
+          <article class="work-step reveal">
+            <div class="step-num">02</div>
+            <h4>Understand</h4>
+            <p>HARVIMON interprets your request and context.</p>
+          </article>
+          <article class="work-step reveal">
+            <div class="step-num">03</div>
+            <h4>Reason</h4>
+            <p>The agent processes the problem and determines an intelligent response.</p>
+          </article>
+          <article class="work-step reveal">
+            <div class="step-num">04</div>
+            <h4>Respond</h4>
+            <p>HARVIMON responds naturally through voice.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="use-cases">
+        <div class="section-head reveal">
+          <div class="section-label">Use Cases</div>
+          <h3>Built for real conversations.</h3>
+        </div>
+        <div class="use-case-grid">
+          <div class="use-case reveal"><span>Explore</span><strong>Learning & Research</strong></div>
+          <div class="use-case reveal"><span>Reason</span><strong>Problem Solving</strong></div>
+          <div class="use-case reveal"><span>Decide</span><strong>Decision Making</strong></div>
+          <div class="use-case reveal"><span>Assist</span><strong>Productivity</strong></div>
+          <div class="use-case reveal"><span>Ask</span><strong>Personal Assistance</strong></div>
+          <div class="use-case reveal"><span>Explore</span><strong>Brainstorming</strong></div>
+          <div class="use-case reveal"><span>Understand</span><strong>Information Discovery</strong></div>
+          <div class="use-case reveal"><span>Ask</span><strong>Everyday Questions</strong></div>
+        </div>
+      </section>
+    </main>
+
+    <section class="download-band reveal" id="download" aria-labelledby="download-title">
+      <div>
+        <div class="section-label">Download</div>
+        <h3 id="download-title">Ready to talk?</h3>
+        <p>Experience HARVIMON on your device.</p>
+        <div class="platform">Windows / Desktop Application</div>
+      </div>
+      <div class="download-actions">
+        <button class="btn btn-primary js-download" type="button">Download HARVIMON</button>
+        <div class="download-message" id="download-message" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-inner">
+        <div>
+          <a class="brand" href="#home"><span class="brand-mark" aria-hidden="true"></span><span>HARVIMON</span></a>
+          <p>An intelligent voice agent for natural interaction, reasoning, and assistance.</p>
+        </div>
+        <div class="footer-links" aria-label="Footer links">
+          <a href="#home">Home</a>
+          <a href="#capabilities">Capabilities</a>
+          <a href="#how">How It Works</a>
+          <a href="#download">Download</a>
+        </div>
+        <div class="copyright">© 2026 HARVIMON AI</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const HARVIMON_DOWNLOAD_URL = "/downloads/HARVIMON-AI.exe";
+    const HARVIMON_DOWNLOAD_FILENAME = "HARVIMON-AI.exe";
+
+    const nav = document.querySelector(".site-nav");
+    const navLinks = document.getElementById("nav-links");
+    const hamburger = document.querySelector(".hamburger");
+    const downloadButtons = document.querySelectorAll(".js-download");
+    const downloadMessage = document.getElementById("download-message");
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const updateNav = () => {
+      nav.classList.toggle("scrolled", window.scrollY > 12);
+    };
+    updateNav();
+    window.addEventListener("scroll", updateNav, { passive: true });
+
+    hamburger.addEventListener("click", () => {
+      const expanded = hamburger.getAttribute("aria-expanded") === "true";
+      hamburger.setAttribute("aria-expanded", String(!expanded));
+      navLinks.classList.toggle("open", !expanded);
+    });
+
+    navLinks.addEventListener("click", (event) => {
+      if (event.target.matches("a")) {
+        navLinks.classList.remove("open");
+        hamburger.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14 });
+
+    document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+
+    const bubbleObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll(".bubble").forEach((bubble, index) => {
+          window.setTimeout(() => bubble.classList.add("visible"), prefersReducedMotion ? 0 : index * 520);
+        });
+        bubbleObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.35 });
+    document.querySelectorAll(".conversation").forEach((el) => bubbleObserver.observe(el));
+
+    const isMobileLike = () => {
+      return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth < 720;
+    };
+
+    const setDownloadMessage = (text, state = "") => {
+      downloadMessage.textContent = text;
+      downloadMessage.className = `download-message ${state}`;
+    };
+
+    const triggerDownload = () => {
+      const link = document.createElement("a");
+      link.href = HARVIMON_DOWNLOAD_URL;
+      link.download = HARVIMON_DOWNLOAD_FILENAME;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    };
+
+    const handleDownload = async () => {
+      if (isMobileLike()) {
+        setDownloadMessage("HARVIMON Desktop is available for Windows. Open this page on your Windows laptop or PC to download the application.", "error");
+        document.getElementById("download").scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth" });
+        return;
+      }
+
+      setDownloadMessage("Preparing your download...", "ok");
+      try {
+        const response = await fetch(HARVIMON_DOWNLOAD_URL, { method: "HEAD", cache: "no-store" });
+        if (!response.ok) throw new Error("download unavailable");
+        triggerDownload();
+        setDownloadMessage("Download started.", "ok");
+      } catch (_error) {
+        setDownloadMessage("HARVIMON is currently preparing for download. Please check back shortly.", "error");
+      }
+    };
+
+    downloadButtons.forEach((button) => button.addEventListener("click", handleDownload));
+  </script>
+</body>
+</html>

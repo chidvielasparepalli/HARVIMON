@@ -1,0 +1,63 @@
+# ── CHIDVI 556 — what never belongs in the repository ──────────────────────────
+# Everything listed here is created by the app on first run. A fresh clone with
+# none of it present boots straight to the setup screen, which is the intended
+# first experience — so nothing here needs to be committed, and some of it must
+# never be.
+
+# ── Secrets. Committing any of these publishes them. ──────────────────────────
+config/api_keys.json
+config/certs/
+config/whatsapp_web/
+**/token*.json
+**/client_secret*.json
+*credentials*.json
+.env
+.env.*
+
+# ── Personal data the assistant accumulates about you ─────────────────────────
+memory/long_term.json
+memory/*.db
+
+# ── Voice authentication biometric data ───────────────────────────────────────
+# Never commit voiceprints or raw recordings.
+config/voice_auth/
+voice_auth/*.wav
+voice_auth/*.mp3
+voice_auth/*.flac
+
+# ── Python build noise ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Editors and operating systems ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Runtime output ────────────────────────────────────────────────────────────
+*.log
+logs/
+downloads/
+!downloads/
+downloads/*
+!downloads/README.md
+!downloads/HARVIMON-AI.exe
+screenshots/
+
+# ── Vendored barehands — 3D prop models (large binaries, fetch on demand) ─────
+barehands/media/models/*.glb
