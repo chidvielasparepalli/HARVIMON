@@ -949,3 +949,7 @@ class DashboardServer:
         print(f"[Dashboard] {proto}://{self._ip}:{PORT}")
         print("[Dashboard] Press 'Remote Control' in JARVIS UI to get the QR code.")
         await uvicorn.Server(cfg).serve()
+
+# Vercel/ASGI entrypoint: expose the FastAPI app at module scope.
+# The local desktop runtime still creates its own DashboardServer instance.
+app = DashboardServer().app
